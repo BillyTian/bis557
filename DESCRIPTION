@@ -1,0 +1,19 @@
+Package: bis557
+Title: Package containing assignments, projects or other products in BIS557
+Version: 0.0.1
+Authors@R: 
+    person(given = "Zizhong",
+           family = "Tian",
+           role = c("aut", "cre"),
+           email = "zizhong.tian@yale.edu",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: This package contains the answers for the homework assignments or any other products made for BIS557.
+License: LGPL (>= 2.1)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1
+Suggests: 
+    testthat
+Depends: 
+    R (>= 2.10)
