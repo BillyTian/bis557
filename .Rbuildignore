@@ -1,3 +1,6 @@
 ^bis557\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^data-raw$
+^\.travis\.yml$
+^README\.Rmd$

@@ -4,21 +4,29 @@
 \alias{linear_model}
 \title{Fit a linear model}
 \usage{
-linear_model(formula, data, contrasts = NULL)
+linear_model(formula.input, data.input, contrasts.input = NULL)
 }
 \arguments{
-\item{formula}{a formula with the legal format.}
+\item{formula.input}{a formula with the legal format.}
 
-\item{data}{a dataframe provided by the user.}
+\item{data.input}{a dataframe provided by the user.}
 
-\item{contrasts}{a list of contrasts of interest (default=NULL).}
+\item{contrasts.input}{a list of contrasts of interest (default=NULL).}
+}
+\value{
+a list including the OLS estimates, simulating what will be produced by 'lm()'.
 }
 \description{
-This is a function implement the linear regression
-and approximately reproduce the coefficients in the linear model
-object that can be created by 'lm()'.
+This is a function to approximately reproduce the coefficients
+in the linear model object that can be created by 'lm()'. The method being
+used to compute the OLS estimates is orthogonal projection.
 }
 \examples{
 data(iris)
-linear_model(Sepal.Length ~ ., iris)
+fit <- linear_model(Sepal.Length ~ ., iris)
+fit$coefficients
+}
+\references{
+This work references the methodology and coding logic in the textbook
+"A Computational Approach to Statistical Learning" by Arnold, Kane, and Lewis (p.24).
 }

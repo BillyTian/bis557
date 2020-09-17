@@ -1,131 +1,73 @@
-#' @title Gradient Descent
-
-#' @description Compute a linear regression via gradient descent. Passes input to linear_model if data frame is not full rank.
-
-#'
-
-#' @param formula A formula of form "A ~ B".
-
-#' @param data A dataframe.
-
-#' @param contrasts A list of contrasts; default is NULL.
-
-#' @param factor The factor by which to adjust beta along gradient; default is 0.0001.
-
-#' @param max_Iter Maximum number of iterations before the loop exits; default is 500,000.
-
-#' @param threshold Size of difference between previous and new betas at which the loop exits; default is 0.001.
-
-#' @return A list of coefficients from an lm model via gradient descent.
-
+#' @title Implement Gradient Descent for OLS
+#' @description This is a function to numerically compute OLS estimates via
+#' implementing the gradient descent method. Its reception of inputs and the
+#' coefficient grabbing are all similar to 'lm()' function.
+#' @param formula.input a formula with the legal format.
+#' @param data.input a dataframe provided by the user.
+#' @param contrasts.input a list of contrasts of interest (default=NULL).
+#' @param gamma.input a factor defined by user as a pace or speed of gradient descent (default=0.0001).
+#' @param max.itera a maximum number of iterations set by user (default=1e6).
+#' @param stop.diff a minimum absolute difference between SSR and the updated,
+#' which is an alternative criterion to stop the iterations (default=1e-12).
+#' @return A list including the OLS estimates, simulating what will be produced by 'lm()'.
 #' @examples
-
-#' \dontrun{
-
 #' data(iris)
-
-#' grad_desc(Sepal.Length ~ ., iris)
-
-#' }
-
-#' @importFrom stats model.matrix setNames
-
+#' fit <- linear_model(Sepal.Length ~ ., iris)
+#' fit$coefficients
 #' @export
 
 
+gradient_descent <- function(formula.input, data.input, contrasts.input = NULL, gamma.input = 0.0001, max.itera = 1e6, stop.diff = 1e-12){
 
-grad_desc <- function(formula, data, contrasts = NULL, factor = 0.0001, max_Iter = 5e5, threshold = 1e-12){
-  
-  
-  
-  # define model matrix, response variable, beta_k
-  
-  X <- model.matrix(formula, data, contrasts.arg = contrasts)
-  
-  Y <- as.matrix(subset(data, select = as.character(formula[[2]])), ncol = 1)
-  
-  beta_k <- matrix(1, ncol = 1, nrow = ncol(X))
-  
-  
-  
-  # define helper function check_r: finds sum of squared residuals
-  
-  check_r <- function(beta, Y, X) {
-    
-    drop(t(Y) %*% Y + t(beta) %*% t(X) %*% X %*% beta - 2 * t(Y) %*% X %*% beta)
-    
+  #Extract the independent variables
+  X <- model.matrix(formula.input, data.input, contrasts.arg = contrasts.input)
+
+  #Create a dataset dropping NAs in regressors, preparing for extracting a Y vector with proper length
+  data_no_na <- model.frame(formula.input, data.input)
+
+  #Identify the name of dependent variable
+  y_name <- as.character(formula.input)[2]
+
+  #Extract a vector of response variable
+  Y <- as.matrix(data_no_na[,y_name], ncol = 1)
+
+  #Initialize beta vector
+  beta <- matrix(1, ncol = 1, nrow = ncol(X))
+
+  #Compute the current sum of squared residuals
+  ssr <- function(beta.input, X, Y){
+    return(as.numeric(t(Y) %*% Y - t(Y) %*% X %*% beta.input - t(beta.input) %*% t(X) %*% Y + t(beta.input) %*% t(X) %*% X %*% beta.input))
   }
-  
-  
-  
-  # define helper function df: takes step toward beta
-  
-  df <- function(beta, Y, X){
-    
-    (2 * t(X) %*% X %*% beta - 2 * t(X) %*% Y)
-    
+
+  #Compute the gradient based on some updated beta
+  gradient <- function(beta.input, X, Y){
+    return(-2*t(X) %*% Y + 2*t(X) %*% X %*% beta.input)
   }
-  
-  
-  
-  # divert if not full rank
-  
-  if(qr(X)$rank == dim(X)[2]){
-    
-    #define counter to set max number of loops
-    
-    counter = 1
-    
-    diff = 10
-    
-    
-    
-    # initiate while loop to check for improvement in residuals and stop after a given point
-    
-    while ((counter < max_Iter) & (diff > threshold)){
-      
-      r1 <- check_r(beta_k, Y, X) # check residuals
-      
-      beta_k <- beta_k - factor * df(beta_k, Y, X)  # improve beta_k
-      
-      r2 <- check_r(beta_k, Y, X) # check updated residuals
-      
-      diff <- r1 - r2
-      
-      counter = counter + 1
-      
-    }
-    
-    
-    
-    
-    
-    # print some useful info
-    
-    print(sprintf("Gradient descent completed after %i iterations", counter))
-    
-    print(sprintf("The final difference in the residuals was: %f,", diff))
-    
-    
-    
-    # convert to list that matches lm output
-    
-    gd <- list(coefficients = beta_k)
-    
-    list(coefficients = setNames(as.numeric(gd$coefficients), dimnames(gd$coefficients)[[1]]))
-    
+
+  #Sum of squared residuals computed with initial beta
+  ssr0 <- ssr(beta, X, Y)
+
+  #Initialize some absolute difference updated ssr and the old and a count of iterations
+  ss.diff <- 1
+  count <- 0
+
+  while ((ss.diff > stop.diff) & (count < max.itera)){
+    #Update beta by implement the gradient descent in a rate of gamma
+    beta <- beta - gamma.input*gradient(beta, X, Y)
+
+    #Check the absolute difference of ssr at the current iteration
+    ss.diff <- abs(ssr(beta, X, Y) - ssr0)
+
+    #Before closing the current iteration, update ssr0 (the reference) and the counter
+    ssr0 <- ssr(beta, X, Y)
+    count <- count + 1
   }
-  
-  
-  
-  # pass to linear_model()
-  
-  else{
-    
-    warning("Data frame has perfect collinearity. Passing to linear_model().")
-    
-    linear_model(formula, data, contrasts = NULL)
-    
-  }
-  
+
+  beta <- as.vector(beta)
+
+  #Extract the names of independent variables and match them to the estimates
+  names(beta) <- colnames(X)
+
+  #Return a list where the user can call the coefficient estimates
+  return(list(coefficients=beta))
 }
