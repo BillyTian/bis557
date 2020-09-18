@@ -7,6 +7,8 @@
 
 [![Travis build
 status](https://travis-ci.com/BillyTian/bis557.svg?branch=master)](https://travis-ci.com/BillyTian/bis557)
+[![Codecov test
+coverage](https://codecov.io/gh/BillyTian/bis557/branch/master/graph/badge.svg)](https://codecov.io/gh/BillyTian/bis557?branch=master)
 <!-- badges: end -->
 
 The goal of bis557 is to encapsulate homework assignments and other
