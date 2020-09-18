@@ -1,7 +1,7 @@
 #' @title Fit a linear model
 #' @description This is a function to approximately reproduce the coefficients
 #' in the linear model object that can be created by 'lm()'. The method being
-#' used to compute the OLS estimates is orthogonal projection.
+#' used to compute the OLS estimates is QR decomposition.
 #' @param formula.input a formula with the legal format.
 #' @param data.input a dataframe provided by the user.
 #' @param contrasts.input a list of contrasts of interest (default=NULL).
@@ -10,8 +10,6 @@
 #' data(iris)
 #' fit <- linear_model(Sepal.Length ~ ., iris)
 #' fit$coefficients
-#' @references This work references the methodology and coding logic in the textbook
-#' "A Computational Approach to Statistical Learning" by Arnold, Kane, and Lewis (p.24).
 #' @export
 
 
@@ -29,15 +27,11 @@ linear_model <- function(formula.input, data.input, contrasts.input=NULL){
   #Extract a vector of response variable
   Y <- as.matrix(data_no_na[,y_name], ncol = 1)
 
-  #Compute the QR decomposition of X, individually extract Q and R components
-  Q <- qr.Q(qr(X))
-  R <- qr.R(qr(X))
+  #Derive OLS estimates via QR decomposition, which subtly deals with strong collinearity (automatic rank adjustment)
+  beta <- as.vector(qr.solve(X, Y))
 
-  #Compute the cross product
-  QtY <- t(Q) %*% Y
-
-  #Back solve the triangular system defined by the matrix R
-  beta <- as.vector(backsolve(R, QtY))
+  #Simulate the behavior of 'lm()', display NA instead of 0 when encountering collinearity
+  beta[beta==0] <- NA
 
   #Extract the names of independent variables and match them to the estimates
   names(beta) <- colnames(X)
@@ -45,5 +39,3 @@ linear_model <- function(formula.input, data.input, contrasts.input=NULL){
   #Return a list where the user can call the coefficient estimates
   return(list(coefficients=beta))
 }
-
-

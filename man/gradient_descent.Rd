@@ -5,7 +5,8 @@
 \title{Implement Gradient Descent for OLS}
 \usage{
 gradient_descent(formula.input, data.input, contrasts.input = NULL,
-  gamma.input = 1e-04, max.itera = 1e+06, stop.diff = 1e-12)
+  gamma.input = 1e-04, beta0 = 1, stop.diff = 1e-12,
+  max.itera = 1e+06)
 }
 \arguments{
 \item{formula.input}{a formula with the legal format.}
@@ -16,18 +17,21 @@ gradient_descent(formula.input, data.input, contrasts.input = NULL,
 
 \item{gamma.input}{a factor defined by user as a pace or speed of gradient descent (default=0.0001).}
 
-\item{max.itera}{a maximum number of iterations set by user (default=1e6).}
+\item{beta0}{an initializer for the beta vector that can be changed by user (default=1).}
 
-\item{stop.diff}{a minimum absolute difference between SSR and the updated,
-which is an alternative criterion to stop the iterations (default=1e-12).}
+\item{stop.diff}{an absolute difference between SSR and the updated one set by user
+to stop the iteration at some satisfying point (default=1e-12).}
+
+\item{max.itera}{a maximum number of iterations set by user,
+which is an alternative criterion to stop the iterations (default=1e6).}
 }
 \value{
-A list including the OLS estimates, simulating what will be produced by 'lm()'.
+a list including the OLS estimates, simulating what will be produced by 'lm()'.
 }
 \description{
 This is a function to numerically compute OLS estimates via
 implementing the gradient descent method. Its reception of inputs and the
-coefficient grabbing are all similar to 'lm()' function.
+coefficients grabbed are all similar to 'lm()' function.
 }
 \examples{
 data(iris)

@@ -21,3 +21,12 @@ The development version of the packages can be installed from
 # install.packages("devtools")
 devtools::install_github("BillyTian/bis557")
 ```
+
+## Example
+
+``` r
+data(iris)
+# Simulate 'lm()'
+fit_lm <- linear_model(Sepal.Length ~ ., iris)
+fit_lm$coefficients
+```

@@ -1,6 +1,6 @@
 library(testthat)
 
-context("Test the output of homework 1: linear-model")
+context("Test the output of homework 1: linear_model().")
 
 test_that("You linear_model() function works in an easy case.", {
 

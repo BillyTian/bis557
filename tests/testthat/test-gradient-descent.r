@@ -1,77 +1,27 @@
 library(testthat)
 
+context("Test the output of homework 1: gradient_descent().")
 
+test_that("Your gradient_descent() function returns approximately the same coefficients as lm.", {
 
-context("Test the output of grad_desc().")
-
-
-
-test_that("Your grad_desc() function returns the same coefficients as lm.", {
-  
-  
-  
   data(iris)
-  
-  
-  
-  fit_grad_desc <- grad_desc(Sepal.Length ~ ., iris)
-  
-  
-  
+  fit_gd <- gradient_descent(Sepal.Length ~ ., iris)
   fit_lm <- lm(Sepal.Length  ~ ., iris)
-  
-  
-  
-  expect_equivalent(fit_lm$coefficients, fit_grad_desc$coefficients,
-                    
-                    tolerance = 1e-3)
-  
+  expect_equivalent(fit_lm$coefficients, fit_gd$coefficients, tolerance = 0.001)
 })
 
+test_that("Your gradient_descent() function works with contrasts.", {
 
-
-test_that("Your grad_desc() function works with contrasts.", {
-  
-  
-  
   data(iris)
-  
-  
-  
-  fit_grad_desc <- grad_desc(Sepal.Length ~ ., iris,
-                             
-                             contrasts = list(Species = "contr.sum"))
-  
-  
-  
+  fit_gd <- gradient_descent(Sepal.Length ~ ., iris, contrasts = list(Species = "contr.sum"))
   fit_lm <- lm(Sepal.Length  ~ ., iris, contrasts = list(Species = "contr.sum"))
-  
-  
-  
-  expect_equivalent(fit_lm$coefficients, fit_grad_desc$coefficients,
-                    
-                    tolerance = 1e-3)
-  
+  expect_equivalent(fit_lm$coefficients, fit_gd$coefficients, tolerance = 0.001)
 })
 
-test_that("Your grad_desc() function works in a tougher case.", {
-  
-  
-  
+test_that("Your gradient_descent() function works in a special case with collinearity.", {
+
   data(lm_patho)
-  
-  
-  
-  fit_grad_desc <- grad_desc(y ~., lm_patho)
-  
-  
-  
+  fit_gd <- gradient_descent(y ~., lm_patho)
   fit_lm <- lm(y ~., lm_patho)
-  
-  
-  
-  expect_equivalent(fit_lm$coefficients, fit_grad_desc$coefficients,
-                    
-                    tolerance = 1e-3)
-  
+  expect_equivalent(fit_lm$coefficients, fit_gd$coefficients, tolerance = 0.001)
 })

@@ -19,14 +19,10 @@ a list including the OLS estimates, simulating what will be produced by 'lm()'.
 \description{
 This is a function to approximately reproduce the coefficients
 in the linear model object that can be created by 'lm()'. The method being
-used to compute the OLS estimates is orthogonal projection.
+used to compute the OLS estimates is QR decomposition.
 }
 \examples{
 data(iris)
 fit <- linear_model(Sepal.Length ~ ., iris)
 fit$coefficients
-}
-\references{
-This work references the methodology and coding logic in the textbook
-"A Computational Approach to Statistical Learning" by Arnold, Kane, and Lewis (p.24).
 }
