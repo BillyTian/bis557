@@ -1,0 +1,48 @@
+---
+title: "HW1-Summary"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{HW1-Summary}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bis557)
+```
+
+
+### This is a grader-friendly checklist for HW#1.
+
+### 1. 
+Create an R package called 'bis557'.
+
+### 2. 
+Check 'linear-model.R' in 'R' folder, which includes the function and documentation.
+
+### 3.
+Check 'lm_patho.rda' in 'data' folder.$\\$
+
+Check 'DATASET.R' in 'data-raw' folder, which contains the code to read in raw dataset.$\\$
+
+Check 'lm_patho.R' in 'R' folder, which includes a brief documentation of the data.$\\$
+
+### 4.
+Check 'test-linear-model.r' in folder 'tests' -> 'testthat'.
+
+### 5.
+Check 'gradient-descent.R' in 'R' folder, which includes the function and documentation.
+
+### 6.
+Check 'test-gradient-descent.R' in folder 'tests' -> 'testthat'.
+
+### 7 & 8.
+Check badges on Github page.
+
