@@ -2,3 +2,7 @@
 
 export(gradient_descent)
 export(linear_model)
+export(new_gradient_descent)
+export(optimized_lambda)
+export(predict_ridge)
+export(ridge_regression)

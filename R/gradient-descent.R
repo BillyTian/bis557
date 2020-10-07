@@ -14,7 +14,7 @@
 #' @return a list including the OLS estimates, simulating what will be produced by 'lm()'.
 #' @examples
 #' data(iris)
-#' fit <- linear_model(Sepal.Length ~ ., iris)
+#' fit <- gradient_descent(Sepal.Length ~ ., iris)
 #' fit$coefficients
 #' @export
 
@@ -84,6 +84,6 @@ gradient_descent <- function(formula.input, data.input, contrasts.input = NULL, 
     }
 
     #Return a list where the user can call the coefficient estimates
-    return(list(coefficients=beta))
+    return(list(coefficients=beta, formula=formula.input))
   }
 }

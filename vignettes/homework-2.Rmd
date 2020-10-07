@@ -1,0 +1,112 @@
+---
+title: "homework-2"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{homework-2}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bis557)
+```
+
+## Question 1 (CASL 2.11 Exercise #5)
+
+Express the simple regression model of interest in a matrix form, $Y = X\beta$, where $Y=\begin{pmatrix} y_{1} \\ ... \\ y_{n} \end{pmatrix}$, $X=\begin{pmatrix} 1 & x_{1} \\ 1 & x_{2} \\ ...  & ...\\ 1 & x_{n} \end{pmatrix}$. Then, we can write the OLS estimates $\beta = (X^TX)^{-1}X^TY$.$\\$
+$X^TX$ could be written in a $2\times 2$ form: $X^TX =\begin{pmatrix} n & \sum^n_{i=1}x_i \\ \sum^n_{i=1}x_i & \sum^n_{i=1}x_i^2 \end{pmatrix}$.$\\$
+Using the explicit formula of the inverse of a $2\times 2$ matrix, we can derive that
+$$(X^TX)^{-1} = \frac{1}{n\sum^n_{i=1}x_i^2-\left(\sum^n_{i=1}x_i\right)^2} \begin{pmatrix} \sum^n_{i=1}x_i^2 & -\sum^n_{i=1}x_i \\ -\sum^n_{i=1}x_i & n \end{pmatrix}$$
+Set $a=\sum^n_{i=1}x_i^2$, $b=-\sum^n_{i=1}x_i$,
+$$(X^TX)^{-1}X^T = \frac{1}{n\sum^n_{i=1}x_i^2-\left(\sum^n_{i=1}x_i\right)^2} \begin{pmatrix} a+bx_1 & a+bx_2 & ... & a+bx_n \\ b+nx_1 & b+nx_2 & ... & b+nx_n \end{pmatrix}$$
+$$\begin{pmatrix}\hat{\beta_0} \\ \hat{\beta_1} \end{pmatrix}=(X^TX)^{-1}X^TY = \frac{1}{n\sum^n_{i=1}x_i^2-\left(\sum^n_{i=1}x_i\right)^2} \begin{pmatrix} a\sum_{i=1}^ny_i+b\sum_{i=1}^nx_iy_i \\ b\sum_{i=1}^ny_i +n\sum_{i=1}^nx_iy_i\end{pmatrix}$$
+We can finally obtain the least squares estimators that 
+$$\hat{\beta_0}=\frac{\sum^n_{i=1}x_i^2\sum_{i=1}^ny_i-\sum^n_{i=1}x_i\sum^n_{i=1}x_iy_i}{n\sum^n_{i=1}x_i^2-(\sum^n_{i=1}x_i)^2}$$
+$$\hat{\beta_1}=\frac{-\sum^n_{i=1}x_i\sum_{i=1}^ny_i+n\sum^n_{i=1}x_iy_i}{n\sum^n_{i=1}x_i^2-(\sum^n_{i=1}x_i)^2}$$
+
+## Question 2
+A new function fitting the OLS model using gradient descent that calculates the loss based on the out-of-sample accuracy is made. Please check the "new_gradient_descent" funciton in R folder. (It takes 5-10 minutes to run this on my laptop because I use the mean squared residual computed from the cross validation as the measurement of out-of-sample accuracy. So, if necessary, please be careful to run. Sorry for any inconvenience brought to the grader.)$\\$
+The corresponding test code called "test-new-gradient-descent" is in the testthat folder.$\\$
+
+Here, I show the comparison to the OLS model ("gradient_descent" and "lm"):
+```{r}
+data(iris)
+new.gd <- new_gradient_descent(Sepal.Length ~ ., iris)$coefficients
+gd <- gradient_descent(Sepal.Length ~ ., iris)$coefficients
+lm <- lm(Sepal.Length ~ ., iris)$coefficients
+
+test <- data.frame(cbind(new.gd, gd, lm))
+names(test) <- c("new.gd (out-of-sample accuracy)", "gd (OLS)", "lm (OLS)")
+test
+```
+
+
+
+## Question 3
+Please see the function "ridge_regression" and its test code in corresponding folders. Here shows the comparison with the "lm.ridge" function under a collinearity example. We can observe that our function's approach to deal with colinear variable is consistent with what "lm.ridge" can do, and the coefficient estimates are very similar.
+
+```{r, warning=F, message=F}
+library(MASS)
+#Create a data set with a collinear variable
+modified.iris <- iris
+modified.iris$collinear.var <- 2*modified.iris$Petal.Width
+
+ridge_fit <- lm.ridge(Sepal.Length ~ ., modified.iris, lambda = 0.01)
+my_fit <- ridge_regression(Sepal.Length ~ ., modified.iris, lambda = 0.01)
+cbind(coef(ridge_fit), my_fit$coefficients)
+```
+
+
+## Question 4
+Optimizing the ridge parameter based on the function 'optimized_lambda', and visually test that based on a MSE-lambda plot (a test code is also provided in the corresponding folder):
+
+```{r, warning=F, message=F}
+library(rsample)
+library(foreach)
+library(ggplot2)
+
+#Provide a specific formula and a set of lambda as candidates 
+form <- Sepal.Length ~ .
+lambdas <- seq(0, 0.2, 0.001)
+#Make the cross-validation process reproducible
+set.seed(171394)
+#Call the function to find optimizing lambda based on a specific example
+opt <- optimized_lambda(form, iris, lambdas, 12)
+#Extract MSE vector, optimizing lambda, and the corresponding minimized MSE for plot verification
+MSE.data <- opt$MSE
+optimized.lambda <- opt$lambda
+min.MSE <- opt$min.MSE
+plot.data <- data.frame(cbind(lambdas, MSE.data))
+#Show the MSE vs. lambda plot with optimizing lambda on it
+ggplot(plot.data, aes(x=lambdas, y=MSE.data)) + geom_line() + geom_point(aes(optimized.lambda, min.MSE), color="red")
+
+optimized.lambda
+```
+Under the specific example above, the optimized ridge parameter among the given set of $\lambda$'s is 0.022, which could also be perceived based on the MSE vs. $\lambda$ plot.
+
+## Question 5
+Consider the LASSO penalty $\frac{1}{2n} ||Y - X \beta||_2^2 + \lambda ||\beta||_1$. Then, we can derive that
+$$\begin{aligned}
+\frac{1}{2n} ||Y - X \beta||_2^2 + \lambda ||\beta||_1 &= \frac{1}{2n}(Y^TY + \beta^TX^TX\beta - 2\beta^TX^TY) + \lambda \sum^p_{j=1}|\beta_j|\\
+&= \frac{1}{2n}Y^TY + \frac{1}{2n}\sum_{j=1}^{p}(X_j^TX_j\beta_j^2-2X_j^TY\beta_j+2n\lambda |\beta_j|)
+\end{aligned}$$
+Consider to minimize the $j^{th}$ component of the latter part, 
+$$f(\beta_j)=X_j^TX_j\beta_j^2-2X_j^TY\beta_j+2n\lambda |\beta_j|$$
+
+For the case of $\beta_j > 0$, $f(\beta_j) = X_j^TX_j\beta_j^2-2\beta_jX_j^TY+2n\lambda \beta_j$. Set
+$\frac{\partial f(\beta_j)}{\partial \beta_j} = 2X_j^TX_j\beta_j-2X_j^TY+2n\lambda = 0$, we can solve that $\beta_j = \frac{X_j^TY - n\lambda}{X_j^TX_j}>0$. $\\$
+
+For the case of $\beta_j < 0$, $f(\beta_j) = X_j^TX_j\beta_j^2-2\beta_jX_j^TY-2n\lambda \beta_j$. Set
+$\frac{\partial f(\beta_j)}{\partial \beta_j} = 2X_j^TX_j\beta_j-2X_j^TY-2n\lambda = 0$, we can solve that $\beta_j = \frac{X_j^TY + n\lambda}{X_j^TX_j}<0$. $\\$
+
+For the case of $\beta_j = 0$, $f(\beta_j) = 0$.$\\$
+
+Given that $|X_j^TY| \leq n \lambda$, which is equivalent to $-n\lambda \le X_j^TY \leq n \lambda$, or $X_j^TY + n\lambda\ge0$ and $X_j^TY - n\lambda\le0$. Under these conditions, the first two cases among the three above seem to reach contradictions (as $X_j^TX_j>0$). Therefore, $f(\beta_j) = 0$ must hold under the constraint $|X_j^TY| \leq n \lambda$. To conclude, if $|X_j^TY| \leq n \lambda$, then $\widehat \beta_j^{\text{LASSO}}$ must be zero.
+

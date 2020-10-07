@@ -35,6 +35,6 @@ coefficients grabbed are all similar to 'lm()' function.
 }
 \examples{
 data(iris)
-fit <- linear_model(Sepal.Length ~ ., iris)
+fit <- gradient_descent(Sepal.Length ~ ., iris)
 fit$coefficients
 }
