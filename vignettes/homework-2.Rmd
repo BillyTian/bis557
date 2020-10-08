@@ -32,13 +32,13 @@ $$\hat{\beta_0}=\frac{\sum^n_{i=1}x_i^2\sum_{i=1}^ny_i-\sum^n_{i=1}x_i\sum^n_{i=
 $$\hat{\beta_1}=\frac{-\sum^n_{i=1}x_i\sum_{i=1}^ny_i+n\sum^n_{i=1}x_iy_i}{n\sum^n_{i=1}x_i^2-(\sum^n_{i=1}x_i)^2}$$
 
 ## Question 2
-A new function fitting the OLS model using gradient descent that calculates the loss based on the out-of-sample accuracy is made. Please check the "new_gradient_descent" funciton in R folder. (It takes 5-10 minutes to run this on my laptop because I use the mean squared residual computed from the cross validation as the measurement of out-of-sample accuracy. So, if necessary, please be careful to run. Sorry for any inconvenience brought to the grader.)$\\$
-The corresponding test code called "test-new-gradient-descent" is in the testthat folder.$\\$
+Since the question is kind of vague, I made two versions of new functions fitting the OLS model using gradient descent that calculates the loss based on the out-of-sample accuracy. Please check the "oos_gradient_descent" and "new_gradient_descent" funciton in R folder. (For the latter one, it takes 5-10 minutes to run on my laptop because I use the mean squared residual computed from the k-fold cross validation as the measurement of out-of-sample accuracy. So, if necessary, please be careful to run that.)$\\$
+The corresponding test codes called "test-oos-gradient-descent" and "test-new-gradient-descent" are in the testthat folder.$\\$
 
-Here, I show the comparison to the OLS model ("gradient_descent" and "lm"):
+Here, I show the comparison to the OLS model ("gradient_descent" and "lm"), I only show the result of "oos_gradient_descent", representing for the out-of-sample loss method to compare with OLS here.
 ```{r}
 data(iris)
-new.gd <- new_gradient_descent(Sepal.Length ~ ., iris)$coefficients
+new.gd <- oos_gradient_descent(Sepal.Length ~ ., iris)$coefficients
 gd <- gradient_descent(Sepal.Length ~ ., iris)$coefficients
 lm <- lm(Sepal.Length ~ ., iris)$coefficients
 
